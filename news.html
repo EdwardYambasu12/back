@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>News Update</title>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+
+
+	<input type="text" id="title" placeholder="Enter Title" name="">
+	<br>
+	<br>
+	<label>Cover photo : </label><input type="file" id="cover" placeholder="Cover Photo">
+	<br>
+	<br>
+	<textarea placeholder="Enter News Body" id = "body" rows="5"></textarea>
+	<br>
+	<br>
+	<input type="text" id="author" placeholder="author">
+	<br>
+	<br>
+	<input type = "text" id = "source", placeholder="source">
+	<br>
+	<br>
+	<label>Type of News:</label><select id="category">
+		<option>Transfer</option>
+		<option>Others</option>
+	</select>
+	<br>
+	<br>
+
+	<label> Leagues</label>
+	<select id="Leaguesforchoice">
+		<option></option>
+	</select>
+
+	<label> Teams</label>
+	<select id="teamsforchoice">
+		<option></option>
+	</select>
+
+	<label> Players</label>
+	<select id="playerforchoice">
+		<option></option>
+	</select>
+
+	<br>
+	
+	<hr>
+
+	<label>Should every one recieve notification for this news:</label>
+	<input type="checkbox" placeholder ="yes" id="notify">
+	
+	<br>
+	<button id = "add_image">Add Image</button>
+	<input type="file" hidden id="adder" name="">
+
+	<button id="submit">submit</button>
+
+	<script type="text/javascript">
+		const title = document.querySelector("#title")
+		const cover = document.querySelector("#cover")
+		const body = document.querySelector("#body")
+		const author = document.querySelector("#author")
+		const source= document.querySelector("#source")
+		const category = document.querySelector("#category")
+		const league = document.querySelector("#Leaguesforchoice")
+		const team = document.querySelector("#teamsforchoice")
+		const player = document.querySelector("#playerforchoice")
+		const notify = document.querySelector("#notify")
+		const add_button = document.querySelector("#add_image")
+		const adder = document.querySelector("#adder")
+		const submit = document.querySelector("#submit")
+		
+
+
+		var player_ = []
+		var team_ = []
+		var leagues_ = [1,2,3,4,5]
+		var list_of_images = []
+		var additional_paragraph = []
+		var league_id 
+		var team_id 
+		var player_id 
+
+		let trial = []
+			var api = "813ac72085badf12a9f36cfdbe3c5f2a2a74e05e7bcb6a118cf14804547d0b20"
+		async function spay(){
+
+			const raw_data = await axios.get("https://apiv3.apifootball.com/?action=get_leagues&APIkey="+api)
+			const data = raw_data.data
+			
+			league_id = data
+		 const league_values = data.map((item)=>{
+			return(`
+						<option>${item.league_id}</option>
+				`)
+		})
+
+
+		const league_display =  data.map((item)=>{
+			return(
+							`<>${item.league_id} ------ ${item.league_name}</>`
+				)
+		})
+
+
+
+		const dis_league = document.createElement("<div>")
+		dis_league.style.overflowY = "auto";
+		dis_league.style.height = "100px";
+		dis_league.innerHTML = league_display
+		document.body.appendChild(dis_league)
+
+		league.innerHTML = league_values
+	}
+
+	spay()
+
+var dim
+var dataa
+async function change_in_league(){
+		console.log(league.value, "this is the league value")
+		const raw_data = await axios.get("https://apiv3.apifootball.com/?action=get_teams&league_id="+league.value+"&APIkey="+api)
+		dataa = raw_data.data
+		team_id = dataa
+
+		const team_values =  dataa.map((item)=>{
+				return(
+						`<option>${item.team_key}</option>`
+					)
+		})
+
+
+		team.innerHTML = team_values
+		dim = team.value
+
+
+
+
+
+
+
+
+		const team_display =  data.map((item)=>{
+			return(
+							`<>${item.team_key} ------ ${item.team_name}</>`
+				)
+		})
+
+
+
+
+
+		const tem_league = document.createElement("<div>")
+		tem_league.style.overflowY = "auto";
+		tem_league.style.height = "100px";
+		tem_league.innerHTML = team_display
+		document.body.appendChild(tem_league)
+}
+		
+
+
+
+function change_in_team(){
+		console.log(team.value, "this is the league value")
+	
+		data = dataa
+
+		console.log(data, dim)
+		const filterer = data.find((id)=> id.team_key === dim)
+			console.log(filterer, "selected")
+		const player_values =  filterer.players.map((item)=>{
+				return(
+						`<option>${item.player_key}</option>`
+					)
+		})
+
+
+		player.innerHTML = player_values
+
+
+
+
+
+
+		const pl_display =  data.map((item)=>{
+			return(
+							`<>${item.player_key} ------ ${item.player_name}</>`
+				)
+		})
+
+
+
+
+
+		const pla_league = document.createElement("<div>")
+		pla_league.style.overflowY = "auto";
+		pla_league.style.height = "100px";
+		pla_league.innerHTML = pl_display
+		document.body.appendChild(pla_league)
+
+}
+		
+
+
+
+
+		league.addEventListener("change", (e)=>{
+			
+			change_in_league()
+
+
+		})
+		team.addEventListener("change", (e)=>{
+
+			change_in_team()
+		})
+
+		///FUnction to convert selected image and covert it to base10 and pusht into the array
+
+		function converter(e){
+			const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64String = e.target.result;
+                    
+               trial.push(base64String)
+                };
+                reader.readAsDataURL(file);
+                 
+            }
+            const additional_space = document.createElement("textarea")
+
+            const button = document.createElement("button")
+            button.innerHTML = "Add Paragraph"
+            button.addEventListener("click", (e)=>{
+            	additional_paragraph.push(additional_space.value)
+            	console.log(additional_paragraph)
+            	document.body.removeChild(additional_space)
+            	document.body.removeChild(button )
+            })
+            
+
+            const br = document.createElement("hr")
+
+
+             document.body.appendChild(br)
+
+            document.body.appendChild(additional_space)
+            document.body.appendChild(button)
+
+
+			
+
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+		adder.addEventListener("change", (e)=>{
+			console.log("Requesting permission to get other images")
+			converter(e)
+		})
+
+		add_button.addEventListener("click", (e)=>{
+			adder.click()
+			console.log(notify.checked)
+		})
+
+		var cover_ph
+
+		cover.addEventListener("change", (e)=>{
+
+			const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                     cover_ph = e.target.result;
+                    
+               
+                };
+                reader.readAsDataURL(file);
+                 
+            }
+
+           
+
+			
+		})
+
+		submit.addEventListener("click", (e)=>{ 
+
+
+			const filter_1 = league_id.find((id)=> id.id == league.value)
+			const filter_2 = team_id.find((id)=> id.id == team.id)
+
+
+
+			const coming =
+		{title : title.value, 
+		cover : cover_ph, 
+		 body : body.value,
+		author : author.value,
+		 source : source.value, 
+		 category : category.value,
+		  notify : notify.checked, 
+		  selected_league : league.value, 
+		 selected_team :  team.value,
+		 additon : additional_paragraph,
+		   selected_player : player.value, 
+		   other_images : trial
+
+	
+	}
+
+	const stringer = JSON.stringify(coming)
+	console.log(stringer)
+
+	console.log(coming)
+
+
+
+			console.log(trial)
+			async function submiter(){
+					await fetch("https://backend-server-u8kn.onrender.com/news", {method : "POST", headers : {"content-type": "application/x-www-form-urlencoded"}, body : new URLSearchParams({id:stringer } )})
+			}	
+
+			submiter()
+
+			
+		})
+
+
+
+
+
+	</script>
+
+
+</body>
+
+
+</html>
